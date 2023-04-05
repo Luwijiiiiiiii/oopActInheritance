@@ -1,0 +1,177 @@
+#include <iostream>
+#include <ctime>
+using namespace std;
+
+class Entity{
+    public :
+        const int lowestHP = 0;
+        const int heal = 10;
+        int attackDamage, healthPts, warriorHp, monsdamage, monsterHp;
+        void setplayerDamage() {
+            int pdamage;
+            pdamage = rand()%6 + 1;
+            attackDamage = pdamage;
+            cout<<"Player Damage: "<<attackDamage<<endl;
+        }
+        void sethP(int i) {
+            healthPts = i;
+            if(healthPts <= 0) {
+                healthPts = lowestHP;
+            }
+        }
+        void setwarriorHp() {
+            warriorHp = 10;
+        }
+        void isnotPlayable() {
+
+        cout<<"Please use another player....."<<endl;
+        }
+};
+class monster: public Entity{
+    public:
+        void setmonsterHp() {
+            monsterHp = 30;
+        }
+        void setmonsDamage() {
+            int damage;
+            damage = rand()%6+1;
+            monsdamage = damage;
+            cout<<"Monster Damage:"<<monsdamage<<endl;
+        }
+};
+class warrior: public Entity{
+    public:
+        //all are inherited in Entity
+};
+class master: public Entity{
+    public: 
+        bool superDouble;
+        void setdoubleDamage() {
+            int dDamage;
+            dDamage = rand() % 6 + 1;
+            attackDamage = dDamage*2;
+            cout<<"Player Damage: "<<attackDamage<<" (damage is doubled due to effects)"<<endl;
+        }
+        void isDoubleUse() {
+            static bool superDouble = false;
+            if(!superDouble) {
+                char value;
+                cout<<"Do you want to use masters skill? (Y/N): "<<endl;
+                cin>>value;
+                switch(value) {
+                    case 'Y': 
+                        superDouble = true;
+                        setdoubleDamage();
+                        healthPts = lowestHP;
+                        break;
+                    case 'N':
+                        superDouble = false;
+                        setplayerDamage();
+                        break;
+                }
+            }
+        }
+};
+class healer: public Entity{
+    public:
+        bool superheal;
+        void sethealDamage() {
+            int pdamage;
+            pdamage = rand()%6 + 1;
+            attackDamage = pdamage/2;
+            cout<<"Player Damage: "<<attackDamage<<" (damage is divided by 2 due to effects)"<<endl;
+        }
+        bool isHealUse() {
+            static bool superheal = false;
+            if(!superheal) {
+                char answer;
+                cout<<"Do you want to use healers skill? (Y/N): "<<endl;
+                cin>>answer;
+                switch(answer) {
+                    case 'Y': 
+                        superheal = true;
+                        sethealDamage();
+                        warriorHp = heal;
+                        
+                        
+                        break;
+                    case 'N':
+                        superheal = false;
+                        setplayerDamage();
+                    break;
+                }
+            }
+            return false;
+        }
+};
+int main()
+{
+    srand(time(NULL));//random generator
+    //setup 
+    warrior Warrior;
+    Warrior.setwarriorHp();
+    Warrior.warriorHp;
+    
+    healer Healer;
+    Healer.sethP(10);
+    Healer.healthPts;
+    
+    master Master;
+    Master.sethP(10);
+    Master.healthPts;
+    
+    monster Monster;
+    Monster.setmonsterHp();
+    Monster.monsterHp;
+    //Scene
+        for(int i = 1; i < 20; i++) {
+        cout<<"Life Status: M = "<<Master.healthPts  << " H = "<< Healer.healthPts<< " W = " <<Warrior.warriorHp<<" Monster: "<<Monster.monsterHp<<endl;
+        cout<<"=========== Round "<<i<<" ==========="<<endl;
+        cout<<"Choose a player (m , h, w): ";
+        char ans;
+        cin>>ans;
+        if(ans == 'm'){
+            Master.isDoubleUse();
+            Monster.monsterHp = Monster.monsterHp - Master.attackDamage;
+            Monster.setmonsDamage();
+            Master.healthPts = Master.healthPts - Monster.monsdamage;
+        }
+        else if(ans == 'h') {
+            if(Healer.isHealUse() == false) {
+            Warrior.setwarriorHp();
+            }
+            Monster.monsterHp = Monster.monsterHp - Healer.attackDamage;
+            Monster.setmonsDamage();
+            Healer.healthPts = Healer.healthPts - Monster.monsdamage;
+        }
+        else if(ans == 'w'){
+            Warrior.setplayerDamage();
+            Monster.monsterHp = Monster.monsterHp - Warrior.attackDamage;
+            Monster.setmonsDamage();
+            Warrior.warriorHp = Warrior.warriorHp - Monster.monsdamage;    
+        }else {
+            cout<<"input a real player!.."<<endl;
+        }
+        //damagecheck<0
+        if(Master.healthPts < 0) {
+            Master.isnotPlayable();
+            Master.healthPts = Master.lowestHP;
+            }
+         if(Healer.healthPts < 0) {
+            Healer.isnotPlayable();
+            Healer.healthPts = Healer.lowestHP;
+            
+            }
+         if(Warrior.warriorHp < 0) {
+            Warrior.isnotPlayable();
+            Warrior.warriorHp = Warrior.lowestHP;
+            
+         }
+         if(Warrior.warriorHp <= 0&&Healer.healthPts <= 0&&Master.healthPts<=0||Monster.monsterHp <=0) {
+             break;
+         }
+         
+    }
+    cout<<"\n\nMonster defeated!!\nCongratulations in finishing the game!!!"<<endl;
+    return 0;
+}
